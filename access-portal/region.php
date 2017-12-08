@@ -21,6 +21,10 @@ if ($end_date = ($_REQUEST['end_date'] ?? '')) {
   <meta property="og:site_name" content="Devec/Demography Data Portal" />
   <meta property="og:locale" content="en_US" />
   <title><?= $title ? $title . " - Devec/Demography Data Portal" : "Devec/Demography Data Portal" ?></title>
+  <link rel="stylesheet" href="/tablesorter.css">
+  <script src="/jquery.min.js"></script>
+  <script src="/jquery.tablesorter.js"></script>
+  <script src="/anchor.min.js"></script>
 </head>
 <body>
 <nav>
@@ -81,5 +85,9 @@ sort($datasets);
 </tbody>
 </table>
 
+<script>
+    $(function(){$("table").tablesorter();});
+    anchors.add();
+</script>
 </body>
 </html>
