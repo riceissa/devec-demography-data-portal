@@ -48,7 +48,7 @@ function datasets_by_year_for_metric($mysqli, $metric, $region, $start_date, $en
   // Stores table data in dataset(units) by year format. For example,
   // $data['maddison2010 (1990 international dollar)']['20050000'] would
   // access the value for Maddison 2010 for the year 2005 for some metric
-  // measured in 1990 internationa dollar.
+  // measured in 1990 international dollar.
   $data = array();
 
   $datasets = array();
