@@ -35,58 +35,69 @@ if ($end_date = ($_REQUEST['end_date'] ?? '')) {
 
 <h1><?= $title ?></h1>
 
-<h2>GDP</h2>
-
 <?php
-if ($stmt = $mysqli->prepare("select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = 'GDP'")) {
-  $stmt->bind_param("sss", $region, $start_date, $end_date);
-  $stmt->execute();
-  $result = $stmt->get_result();
-}
+function datasets_by_year_for_metric($mysqli, $metric, $region, $start_date, $end_date) {
+  $ret = "<h2>$metric</h2>";
 
-// dataset by year
-$data = array();
-$datasets = array();
-$odates = array();
-
-while ($row = $result->fetch_assoc()) {
-  $rowname = $row['shortname'] . " (" . $row['units'] . ")";
-  if (!in_array($rowname, $datasets)) {
-    $datasets[] = $rowname;
+  if ($stmt = $mysqli->prepare("select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ?")) {
+    $stmt->bind_param("ssss", $region, $start_date, $end_date, $metric);
+    $stmt->execute();
+    $result = $stmt->get_result();
   }
-  if (!in_array($row['odate'], $odates)) {
-    $odates[] = $row['odate'];
-  }
-  $data[$rowname][$row['odate']] = $row['value'];
-}
 
-sort($odates);
-sort($datasets);
+  // Stores table data in dataset(units) by year format. For example,
+  // $data['maddison2010 (1990 international dollar)']['20050000'] would
+  // access the value for Maddison 2010 for the year 2005 for some metric
+  // measured in 1990 internationa dollar.
+  $data = array();
+
+  $datasets = array();
+  $odates = array();
+
+  while ($row = $result->fetch_assoc()) {
+    $rowname = $row['shortname'] . " (" . $row['units'] . ")";
+    if (!in_array($rowname, $datasets)) {
+      $datasets[] = $rowname;
+    }
+    if (!in_array($row['odate'], $odates)) {
+      $odates[] = $row['odate'];
+    }
+    $data[$rowname][$row['odate']] = $row['value'];
+  }
+
+  sort($odates);
+  sort($datasets);
+
+  $ret .= "<table>";
+  $ret .= "<thead>";
+  $ret .= "<tr>";
+  $ret .= "<th>Dataset</th>";
+  foreach ($odates as $odate) {
+    $ret .= '<th>' . $odate . '</th>';
+  }
+  $ret .= "</tr>";
+  $ret .= "</thead>";
+  $ret .= "<tbody>";
+
+  foreach ($datasets as $dataset) {
+    $ret .= "<tr>";
+    $ret .= "<td>$dataset</td>";
+      foreach (($odates) as $odate) {
+        $ret .= "<td>" . $data[$dataset][$odate] . "</td>";
+      }
+    $ret .= "</tr>";
+  }
+
+  $ret .= "</tbody>";
+  $ret .= "</table>";
+
+  return $ret;
+}
 ?>
 
-<table>
-  <thead>
-    <tr>
-      <th>Dataset</th>
-      <?php foreach ($odates as $odate) {
-              echo '<th>' . $odate . '</th>';
-            }
-      ?>
-    </tr>
-  </thead>
-  <tbody>
-
-<?php foreach (($datasets) as $dataset) { ?>
-  <tr>
-    <td><?= $dataset ?></td>
-    <?php foreach (($odates) as $odate) { ?>
-      <td><?= $data[$dataset][$odate] ?></td>
-    <?php } ?>
-  </tr>
-<?php } ?>
-
-</tbody>
-</table>
+<?= datasets_by_year_for_metric($mysqli, "GDP", $region, $start_date, $end_date) ?>
+<?= datasets_by_year_for_metric($mysqli, "GDP per capita", $region, $start_date, $end_date) ?>
+<?= datasets_by_year_for_metric($mysqli, "Population", $region, $start_date, $end_date) ?>
 
 <script>
     $(function(){$("table").tablesorter();});
