@@ -33,6 +33,8 @@ if ($end_date = ($_REQUEST['end_date'] ?? '')) {
   <a href="/region.php">Region</a>
 </nav>
 
+<h1><?= $title ?></h1>
+
 <h2>GDP</h2>
 
 <?php
@@ -48,13 +50,14 @@ $datasets = array();
 $odates = array();
 
 while ($row = $result->fetch_assoc()) {
-  if (!in_array($row['shortname'], $datasets)) {
-    $datasets[] = $row['shortname'];
+  $rowname = $row['shortname'] . " (" . $row['units'] . ")";
+  if (!in_array($rowname, $datasets)) {
+    $datasets[] = $rowname;
   }
   if (!in_array($row['odate'], $odates)) {
     $odates[] = $row['odate'];
   }
-  $data[$row['shortname']][$row['odate']] = $row['value'];
+  $data[$rowname][$row['odate']] = $row['value'];
 }
 
 sort($odates);
