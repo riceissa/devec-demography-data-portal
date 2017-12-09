@@ -88,7 +88,8 @@ function metricTable($data, $odates, $datasets) {
     $ret .= "    <tr>\n";
     $ret .= "      <td>$dataset</td>\n";
       foreach (($odates) as $odate) {
-        $ret .= "      <td>" . $data[$dataset][$odate] . "</td>\n";
+        $ret .= '      <td style="text-align: right;">'
+          . $data[$dataset][$odate] . "</td>\n";
       }
     $ret .= "    </tr>\n";
   }
