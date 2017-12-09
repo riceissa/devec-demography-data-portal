@@ -72,7 +72,7 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
   return array($data, $odates, $datasets);
 }
 
-function printMetricTable($data, $odates, $datasets) {
+function metricTable($data, $odates, $datasets) {
   $ret = "<table>\n";
   $ret .= "  <thead>\n";
   $ret .= "    <tr>\n";
@@ -99,13 +99,25 @@ function printMetricTable($data, $odates, $datasets) {
   return $ret;
 }
 
-$result = dataDatasetByYearForMetric($mysqli, "GDP", $region, $start_date, $end_date);
-echo "<h2>GDP</h2>\n";
-echo printMetricTable(...$result);
-$permalinkUrlBase = "http://????";
-$graphIdentifier = "";
-$fileName = metricGraph($result[0], $generateGraphCmdBase, $imagesPath, $permalinkUrlBase, $graphIdentifier);
-print '<img src="/images/' . $fileName . '-timeseries.png" alt="Graph should be here"></img>';
+function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
+    $region, $start_date, $end_date) {
+  $result = dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
+    $end_date);
+  echo "<h2>$metric</h2>\n";
+  echo metricTable(...$result);
+  $permalinkUrlBase = "https://???/region.php#" . $metric;
+  $graphIdentifier = "???";
+  $fileName = metricGraph($result[0], $generateGraphCmdBase, $imagesPath,
+    $permalinkUrlBase, $graphIdentifier);
+  print '<img src="/images/' . $fileName . '-timeseries.png" alt="Graph should be here"></img>';
+}
+
+printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, "GDP",
+  $region, $start_date, $end_date);
+printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, "GDP per capita",
+  $region, $start_date, $end_date);
+printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, "Population",
+  $region, $start_date, $end_date);
 ?>
 
 <script>
