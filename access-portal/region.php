@@ -2,6 +2,7 @@
 <html lang="en">
 <?php
 include_once("backend/globalVariables/passwordFile.inc");
+include_once("backend/metricGraph.inc");
 
 $title = "";
 if ($region = ($_REQUEST['region'] ?? '')) {
@@ -36,8 +37,8 @@ if ($end_date = ($_REQUEST['end_date'] ?? '')) {
 <h1><?= $title ?></h1>
 
 <?php
-function datasets_by_year_for_metric($mysqli, $metric, $region, $start_date, $end_date) {
-  $ret = "<h2>$metric</h2>\n";
+function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
+    $end_date) {
 
   if ($stmt = $mysqli->prepare("select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ?")) {
     $stmt->bind_param("ssss", $region, $start_date, $end_date, $metric);
@@ -68,7 +69,11 @@ function datasets_by_year_for_metric($mysqli, $metric, $region, $start_date, $en
   sort($odates);
   sort($datasets);
 
-  $ret .= "<table>\n";
+  return array($data, $odates, $datasets);
+}
+
+function printMetricTable($data, $odates, $datasets) {
+  $ret = "<table>\n";
   $ret .= "  <thead>\n";
   $ret .= "    <tr>\n";
   $ret .= "      <th>Dataset</th>\n";
@@ -93,11 +98,15 @@ function datasets_by_year_for_metric($mysqli, $metric, $region, $start_date, $en
 
   return $ret;
 }
-?>
 
-<?= datasets_by_year_for_metric($mysqli, "GDP", $region, $start_date, $end_date) ?>
-<?= datasets_by_year_for_metric($mysqli, "GDP per capita", $region, $start_date, $end_date) ?>
-<?= datasets_by_year_for_metric($mysqli, "Population", $region, $start_date, $end_date) ?>
+$result = dataDatasetByYearForMetric($mysqli, "GDP", $region, $start_date, $end_date);
+echo "<h2>GDP</h2>\n";
+echo printMetricTable(...$result);
+$permalinkUrlBase = "http://????";
+$graphIdentifier = "";
+$fileName = metricGraph($result[0], $generateGraphCmdBase, $imagesPath, $permalinkUrlBase, $graphIdentifier);
+print '<img src="/images/' . $fileName . '-timeseries.png" alt="Graph should be here"></img>';
+?>
 
 <script>
     $(function(){$("table").tablesorter();});
