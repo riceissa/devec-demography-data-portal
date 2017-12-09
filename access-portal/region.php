@@ -37,7 +37,7 @@ if ($end_date = ($_REQUEST['end_date'] ?? '')) {
 
 <?php
 function datasets_by_year_for_metric($mysqli, $metric, $region, $start_date, $end_date) {
-  $ret = "<h2>$metric</h2>";
+  $ret = "<h2>$metric</h2>\n";
 
   if ($stmt = $mysqli->prepare("select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ?")) {
     $stmt->bind_param("ssss", $region, $start_date, $end_date, $metric);
@@ -68,28 +68,28 @@ function datasets_by_year_for_metric($mysqli, $metric, $region, $start_date, $en
   sort($odates);
   sort($datasets);
 
-  $ret .= "<table>";
-  $ret .= "<thead>";
-  $ret .= "<tr>";
-  $ret .= "<th>Dataset</th>";
+  $ret .= "<table>\n";
+  $ret .= "  <thead>\n";
+  $ret .= "    <tr>\n";
+  $ret .= "      <th>Dataset</th>\n";
   foreach ($odates as $odate) {
-    $ret .= '<th>' . $odate . '</th>';
+    $ret .= '      <th>' . $odate . '</th>' . "\n";
   }
-  $ret .= "</tr>";
-  $ret .= "</thead>";
-  $ret .= "<tbody>";
+  $ret .= "    </tr>\n";
+  $ret .= "  </thead>\n";
+  $ret .= "  <tbody>\n";
 
   foreach ($datasets as $dataset) {
-    $ret .= "<tr>";
-    $ret .= "<td>$dataset</td>";
+    $ret .= "    <tr>\n";
+    $ret .= "      <td>$dataset</td>\n";
       foreach (($odates) as $odate) {
-        $ret .= "<td>" . $data[$dataset][$odate] . "</td>";
+        $ret .= "      <td>" . $data[$dataset][$odate] . "</td>\n";
       }
-    $ret .= "</tr>";
+    $ret .= "    </tr>\n";
   }
 
-  $ret .= "</tbody>";
-  $ret .= "</table>";
+  $ret .= "  </tbody>\n";
+  $ret .= "</table>\n";
 
   return $ret;
 }
