@@ -31,14 +31,16 @@ function metricGraph($data, $generateGraphCmdBase, $imagesPath,
   sort($odates);
 
   foreach ($datasets as $dataset) {
-    $dataForGraph .= "|$i";
+    $dataForGraph .= "|$dataset";
   }
+  $dataForGraph .= "\n";
 
   foreach ($odates as $odate) {
     $dataForGraph .= $odate;
     foreach ($datasets as $dataset) {
       $dataForGraph .= "|" . ($data[$dataset][$odate] ?? 0);
     }
+    $dataForGraph .= "\n";
   }
 
   $permalinkUrl = $permalinkUrlBase . $graphIdentifier;
