@@ -56,15 +56,21 @@ def get_df(fname, top=0):
         # the string "Total".
         top_cols = df.iloc[-1, 1:].sort_values(ascending=False)[:top].index.tolist()
     df = df[:-1]
-    if "Month" in df:
-        # 200610 -> "2006-10"
-        df['Month'] = pd.to_datetime(df['Month'])
-        df = df.set_index('Month')
-    else:
-        # "Year" must be in df
-        df['Year'] = pd.to_datetime(df['Year'].map(lambda x:
-            str(x) + "-01-01"))
-        df = df.set_index('Year')
+    # if "Month" in df:
+    #     # 200610 -> "2006-10"
+    #     df['Month'] = pd.to_datetime(df['Month'])
+    #     df = df.set_index('Month')
+    # else:
+    #     # "Year" must be in df
+    #     df['Year'] = pd.to_datetime(df['Year'].map(lambda x:
+    #         str(x) + "-01-01"))
+    #     df = df.set_index('Year')
+
+    # Devec uses the "YYYYMMDD" format rather than "YYYY-MM-DD", so adjust to
+    # that.
+    df['Year'] = pd.to_datetime(df['Year'].map(lambda x:
+            str(x)[:len("YYYY")]))
+
     df = df.sort_index()
     if top_cols:
         return df[top_cols]
