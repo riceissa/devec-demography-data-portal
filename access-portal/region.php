@@ -37,6 +37,12 @@ if ($end_date = ($_REQUEST['end_date'] ?? '')) {
 <h1><?= $title ?></h1>
 
 <?php
+// Read data about a metric/region/date range combination from MySQL into a 2D
+// array, data, which stores datasets in rows and dates in columns so that
+// $data[$dataset][$date] gives the value corresponding to the given dataset
+// and date. In addition, return two arrays, odates and datasets. The former
+// contains all dates appearing in the dataset and the latter contains all
+// datasets.
 function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
     $end_date) {
 
@@ -72,6 +78,10 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
   return array($data, $odates, $datasets);
 }
 
+// Given data, odates, and datasets, return a string of an HTML table that has
+// datasets in the rows and odates in the columns, and where the values of the
+// table are data accessed at the given date/dataset combination. The three
+// input arrays are intended to be the output of dataDatasetByYearForMetric.
 function metricTable($data, $odates, $datasets) {
   $ret = "<table>\n";
   $ret .= "  <thead>\n";
@@ -87,7 +97,7 @@ function metricTable($data, $odates, $datasets) {
   foreach ($datasets as $dataset) {
     $ret .= "    <tr>\n";
     $ret .= "      <td>$dataset</td>\n";
-      foreach (($odates) as $odate) {
+      foreach ($odates as $odate) {
         $ret .= '      <td style="text-align: right;">'
           . $data[$dataset][$odate] . "</td>\n";
       }
@@ -100,6 +110,8 @@ function metricTable($data, $odates, $datasets) {
   return $ret;
 }
 
+// Print information for the given metric/region/date range combination. This
+// will print an HTML table and also display an image graphing the data.
 function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
     $region, $start_date, $end_date) {
   $result = dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
