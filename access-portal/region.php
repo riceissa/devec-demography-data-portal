@@ -26,6 +26,21 @@ if ($end_date = ($_REQUEST['end_date'] ?? '')) {
   <script src="/jquery.min.js"></script>
   <script src="/jquery.tablesorter.js"></script>
   <script src="/anchor.min.js"></script>
+  <style type="text/css">
+    table {
+        background-color: #f9f9f9;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+    }
+    table th {
+        background-color: #f2f2f2;
+        border: 1px solid #aaaaaa;
+    }
+    table td {
+        border: 1px solid #aaaaaa;
+    }
+  </style>
 </head>
 <body>
 <nav>
