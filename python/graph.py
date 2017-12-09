@@ -69,7 +69,8 @@ def get_df(fname, top=0):
     # Devec uses the "YYYYMMDD" format rather than "YYYY-MM-DD", so adjust to
     # that.
     df['Year'] = pd.to_datetime(df['Year'].map(lambda x:
-            str(x)[:len("YYYY")]))
+            str(x)[:len("YYYY")] + "-01-01"))
+    df = df.set_index('Year')
 
     df = df.sort_index()
     if top_cols:
