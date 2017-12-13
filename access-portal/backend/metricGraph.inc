@@ -4,44 +4,67 @@
 // https://github.com/vipulnaik/donations/blob/106b938087ad0fd2bbe93d891d1bf8513d54b10c/access-portal/backend/yearlyGraph.inc
 // for code on which this function is based.
 
-function metricGraph($data, $generateGraphCmdBase, $imagesPath,
-    $permalinkUrlBase, $graphIdentifier) {
+// Serialize $data by converting it into a $sep-separated string. For example,
+// suppose $data is the following:
+//     Array
+//     (
+//         [dataset1] => Array
+//             (
+//                 [20050000] => 1
+//                 [20060000] => 2
+//             )
+//
+//         [dataset2] => Array
+//             (
+//                 [20050000] => 3
+//                 [20060000] => 4
+//             )
+//
+//     )
+//
+// Then serializeData($data) will look like:
+//     Year|dataset1|dataset2
+//     20050000|1|2
+//     20060000|3|4
+function serializeData(array $data, string $sep = '|', string $heading = "Year") {
+  $result = $heading;
 
-  // Both of these will (if the starting year is 2005) look like:
-  //     Year|dataset1|dataset2|...
-  //     20050000|val1|val2|...
-  //     20060000|val3|val4|...
-  //     ...
-  $dataForGraph = "Year";
-
-  // Gather all odates and dataset names
-  $datasets = array();
-  $odates = array();
-  foreach ($data as $dataset => $row) {
-    if (!in_array($dataset, $datasets)) {
-      $datasets[] = $dataset;
+  // Gather all row and column names
+  $rowNames = array();
+  $colNames = array();
+  foreach ($data as $rowName => $row) {
+    if (!in_array($rowName, $rowNames)) {
+      $rowNames[] = $rowName;
     }
-    foreach ($row as $odate => $val) {
-      if (!in_array($odate, $odates)) {
-        $odates[] = $odate;
+    foreach ($row as $colName => $val) {
+      if (!in_array($colName, $colNames)) {
+        $colNames[] = $colName;
       }
     }
   }
-  sort($datasets);
-  sort($odates);
+  sort($rowNames);
+  sort($colNames);
 
-  foreach ($datasets as $dataset) {
-    $dataForGraph .= "|$dataset";
+  foreach ($rowNames as $rowName) {
+    $result .= "|$rowName";
   }
-  $dataForGraph .= "\n";
+  $result .= "\n";
 
-  foreach ($odates as $odate) {
-    $dataForGraph .= $odate;
-    foreach ($datasets as $dataset) {
-      $dataForGraph .= "|" . ($data[$dataset][$odate] ?? 0);
+  foreach ($colNames as $colName) {
+    $result .= $colName;
+    foreach ($rowNames as $rowName) {
+      $result .= "|" . ($data[$rowName][$colName] ?? 0);
     }
-    $dataForGraph .= "\n";
+    $result .= "\n";
   }
+
+  return $result;
+}
+
+function metricGraph($data, $generateGraphCmdBase, $imagesPath,
+    $permalinkUrlBase, $graphIdentifier) {
+
+  $dataForGraph = serializeData($data);
 
   $permalinkUrl = $permalinkUrlBase . $graphIdentifier;
   $fileName = hash("md5", $permalinkUrl);
