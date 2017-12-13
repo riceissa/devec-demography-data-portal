@@ -61,25 +61,37 @@ function serializeData(array $data, string $sep = '|', string $heading = "Year")
   return $result;
 }
 
+
+// Write the data stored as a string in $csv to $filePath. Return true if the
+// data has changed and false if the data has not changed since the last time
+// the data was stored.
+function storeData(string $csv, string $filePath) {
+  $dataHasChanged= false;
+
+  if (file_exists(! $filePath)) {
+    file_put_contents($filePath, $csv);
+    $dataHasChanged = true;
+  } else {
+    $previousOutput = file_get_contents($filePath);
+    if ($previousOutput != $csv) {
+      file_put_contents($filePath, $csv);
+      $dataHasChanged = true;
+    }
+  }
+
+  return $dataHasChanged;
+}
+
 function metricGraph($data, $generateGraphCmdBase, $imagesPath,
     $permalinkUrlBase, $graphIdentifier) {
 
   $dataForGraph = serializeData($data);
+  $filePathBase = $imagesPath . $fileName;
+  $filePath = $filePathBase . ".csv";
+  $dataHasChanged = storeData($dataForGraph, $filePath);
 
   $permalinkUrl = $permalinkUrlBase . $graphIdentifier;
   $fileName = hash("md5", $permalinkUrl);
-  $filePathBase = $imagesPath . $fileName;
-  $dataHasChanged= false;
-  if (file_exists(! $filePathBase . ".csv")) {
-    file_put_contents($filePathBase . ".csv", $dataForGraph);
-    $dataHasChanged = true;
-  } else {
-    $previousOutput = file_get_contents($filePathBase . ".csv");
-    if ($previousOutput != $dataForGraph) {
-      $dataHasChanged = true;
-      file_put_contents($filePathBase . ".csv", $dataForGraph);
-    }
-  }
 
   $cmdToExecute = $generateGraphCmdBase . " " . $filePathBase . ".csv " .
     $filePathBase . "-timeseries.png";
