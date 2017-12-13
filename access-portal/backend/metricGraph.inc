@@ -87,8 +87,7 @@ function metricGraph($data, $generateGraphCmdBase, $imagesPath,
 
   $dataForGraph = serializeData($data);
   $filePathBase = $imagesPath . $fileName;
-  $filePath = $filePathBase . ".csv";
-  $dataHasChanged = storeData($dataForGraph, $filePath);
+  $dataHasChanged = storeData($dataForGraph, $filePathBase . ".csv");
 
   $permalinkUrl = $permalinkUrlBase . $graphIdentifier;
   $fileName = hash("md5", $permalinkUrl);
