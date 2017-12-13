@@ -55,6 +55,8 @@ def get_df(fname, top=0):
         # df.iloc[-2] is the Total row, and "1:" skips the first item, which is
         # the string "Total".
         top_cols = df.iloc[-1, 1:].sort_values(ascending=False)[:top].index.tolist()
+    else:
+        top_cols = None
     df = df[:-1]
     # if "Month" in df:
     #     # 200610 -> "2006-10"
