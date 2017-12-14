@@ -53,7 +53,7 @@ function serializeData(array $data, string $sep = '|', string $heading = "Year")
   foreach ($colNames as $colName) {
     $result .= $colName;
     foreach ($rowNames as $rowName) {
-      $result .= "|" . ($data[$rowName][$colName] ?? 0);
+      $result .= "|" . ($data[$rowName][$colName] ?? "NA");
     }
     $result .= "\n";
   }
@@ -63,8 +63,8 @@ function serializeData(array $data, string $sep = '|', string $heading = "Year")
 
 
 // Write the data stored as a string in $csv to $filePath. Return true if the
-// data has changed and false if the data has not changed since the last time
-// the data was stored.
+// data has changed (or the file didn't exist) and false if the data has not
+// changed since the last time the data was stored.
 function storeData(string $csv, string $filePath) {
   $dataHasChanged= false;
 
@@ -82,6 +82,8 @@ function storeData(string $csv, string $filePath) {
   return $dataHasChanged;
 }
 
+// Plot the graph for the metric. Return the md5 filename, which can be used to
+// display the image.
 function metricGraph($data, $generateGraphCmdBase, $imagesPath,
     $permalinkUrlBase, $graphIdentifier) {
 
@@ -103,13 +105,25 @@ function metricGraph($data, $generateGraphCmdBase, $imagesPath,
   return $fileName;
 }
 
+// Get a 1D metric. Here $csv is a string that looks like:
+//     maddison2010 (People)|1128007424.0
+//     pwt80 (People)|1182378560.0
+//     pwt81 (People)|1182378560.0
+//     pwt90 (People)|1188056149.3333333
+//     ted201505ollp ()|1138053.8333333333
+//     ted201509ollp ()|1138053.8333333333
+//     ted201605ollp ()|1138053.8333333333
+// In other words, the dataset is given in the first column, and the values are
+// given on the second column, separated by a pipe.
 function getWholeCsv(string $csv, string $sep = "|") {
   $csv = trim($csv);
   $lines = explode("\n", $csv);
   $result = array();
   foreach ($lines as $line) {
-    $result[] = str_getcsv($line, $sep);
+    $cols = explode($sep, $line);
+    $result[trim($cols[0])] = trim($cols[1]);
   }
+  return $result;
 }
 
 // $permalinkUrlBase and $graphIdentifier are used to see if the stats need to
@@ -121,22 +135,19 @@ function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier)
   $filePathBase = $imagesPath . $fileName;
   $dataHasChanged = storeData($csv, $filePathBase . ".csv");
 
-  /* if ($dataHasChanged or !file_exists($filePathBase . "-stats.txt")) {
+  if ($dataHasChanged or !file_exists($filePathBase . "-stats.txt")) {
     if (file_exists($filePathBase . "-stats.txt")) {
       exec("rm " . $filePathBase . "-stats.txt");
     }
-  } */
-  $output = shell_exec("/home/issa/projects/devec-demography-data-portal/python/compute_stats.py " . $filePathBase . ".csv");
+    $output = shell_exec("/home/issa/projects/devec-demography-data-portal/python/compute_stats.py " . $filePathBase . ".csv");
+    file_put_contents($filePathBase . "-stats.txt", $output);
+  } else {
+    $output = file_get_contents($filePathBase . "-stats.txt");
+  }
+
   $outlist = explode("======", $output);
-  $avg = str_getcsv($outlist[0], "|");
-  $growth = $outlist[1];
-  $logGrowth = $outlist[2];
-  echo "<pre>\n";
-  echo "/home/issa/projects/devec-demography-data-portal/python/compute_stats.py " . $filePathBase . ".csv" . "\n";
-  echo ($outlist[0]) . "\n";
-  echo ($outlist[1]) . "\n";
-  echo print_r($avg) . "\n";
-  echo "</pre>\n";
+  $avg = getWholeCsv($outlist[0]);
+  $growth = getWholeCsv($outlist[1]);
 }
 
 ?>
