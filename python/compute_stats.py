@@ -24,5 +24,23 @@ def main():
     print(log_growth.to_csv(sep='|'))
 
 
+def growth_rate(df):
+    """Calculate the growth rate for each column of df. The growth rate is
+    calculated using the endpoints as if they were on the linear regression
+    line."""
+    result = {}
+    for col in df.columns:
+        mask = df[col].notnull()
+        slope, intercept = np.polyfit(df.index.astype(np.int64)[mask],
+                                      df[col][mask], 1)
+        # Get the first non-null time values for this column
+        first_x = df[col][mask].index.astype(np.int64)[0]
+        last_x = df[col][mask].index.astype(np.int64)[-1]
+        first_y = slope * first + intercept
+        last_y = slope * first + intercept
+        growth = (last_y - first_y) / first_y
+        result[col] = growth
+    return result
+
 if __name__ == "__main__":
     main()
