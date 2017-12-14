@@ -155,7 +155,7 @@ function metricTable($data, $odates, $datasets, $averages, $growthRates) {
 function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
     $region, $start_date, $end_date, $include_private, $pythonDir) {
 
-  $permalinkUrlBase = "https://???/region.php#" . $metric;
+  $permalinkUrlBase = "https://???/region.php#" . $metric . ($include_private ? 'include_private' : 'no_include_private');
   $graphIdentifier = "???";
   $result = dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
     $end_date, $include_private);
