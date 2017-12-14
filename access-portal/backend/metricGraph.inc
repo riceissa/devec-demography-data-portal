@@ -86,11 +86,10 @@ function metricGraph($data, $generateGraphCmdBase, $imagesPath,
     $permalinkUrlBase, $graphIdentifier) {
 
   $dataForGraph = serializeData($data);
-  $filePathBase = $imagesPath . $fileName;
-  $dataHasChanged = storeData($dataForGraph, $filePathBase . ".csv");
-
   $permalinkUrl = $permalinkUrlBase . $graphIdentifier;
   $fileName = hash("md5", $permalinkUrl);
+  $filePathBase = $imagesPath . $fileName;
+  $dataHasChanged = storeData($dataForGraph, $filePathBase . ".csv");
 
   $cmdToExecute = $generateGraphCmdBase . " " . $filePathBase . ".csv " .
     $filePathBase . "-timeseries.png";
@@ -102,6 +101,42 @@ function metricGraph($data, $generateGraphCmdBase, $imagesPath,
   }
 
   return $fileName;
+}
+
+function getWholeCsv(string $csv, string $sep = "|") {
+  $csv = trim($csv);
+  $lines = explode("\n", $csv);
+  $result = array();
+  foreach ($lines as $line) {
+    $result[] = str_getcsv($line, $sep);
+  }
+}
+
+// $permalinkUrlBase and $graphIdentifier are used to see if the stats need to
+// be recalculated. Otherwise the same calculation is used again.
+function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier) {
+  $csv = serializeData($data);
+  $permalinkUrl = $permalinkUrlBase . $graphIdentifier;
+  $fileName = hash("md5", $permalinkUrl);
+  $filePathBase = $imagesPath . $fileName;
+  $dataHasChanged = storeData($csv, $filePathBase . ".csv");
+
+  /* if ($dataHasChanged or !file_exists($filePathBase . "-stats.txt")) {
+    if (file_exists($filePathBase . "-stats.txt")) {
+      exec("rm " . $filePathBase . "-stats.txt");
+    }
+  } */
+  $output = shell_exec("/home/issa/projects/devec-demography-data-portal/python/compute_stats.py " . $filePathBase . ".csv");
+  $outlist = explode("======", $output);
+  $avg = str_getcsv($outlist[0], "|");
+  $growth = $outlist[1];
+  $logGrowth = $outlist[2];
+  echo "<pre>\n";
+  echo "/home/issa/projects/devec-demography-data-portal/python/compute_stats.py " . $filePathBase . ".csv" . "\n";
+  echo ($outlist[0]) . "\n";
+  echo ($outlist[1]) . "\n";
+  echo print_r($avg) . "\n";
+  echo "</pre>\n";
 }
 
 ?>
