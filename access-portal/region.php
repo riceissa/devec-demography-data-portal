@@ -93,11 +93,14 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
   return array($data, $odates, $datasets);
 }
 
-// Given data, odates, and datasets, return a string of an HTML table that has
-// datasets in the rows and odates in the columns, and where the values of the
-// table are data accessed at the given date/dataset combination. The three
-// input arrays are intended to be the output of dataDatasetByYearForMetric.
-function metricTable($data, $odates, $datasets) {
+// Given $data, $odates, and $datasets, return a string of an HTML table that
+// has datasets in the rows and odates in the columns, and where the values of
+// the table are data accessed at the given date/dataset combination. The first
+// three input arrays are intended to be the output of
+// dataDatasetByYearForMetric. $averages and $growthRates are the average for
+// each dataset and the growth rate for each dataset, respectively. These are
+// intended to be the output of calculateStats.
+function metricTable($data, $odates, $datasets, $averages, $growthRates) {
   $ret = "<table>\n";
   $ret .= "  <thead>\n";
   $ret .= "    <tr>\n";
@@ -105,6 +108,8 @@ function metricTable($data, $odates, $datasets) {
   foreach ($odates as $odate) {
     $ret .= '      <th>' . $odate . '</th>' . "\n";
   }
+  $ret .= "      <th>Average</th>\n";
+  $ret .= "      <th>Growth rate</th>\n";
   $ret .= "    </tr>\n";
   $ret .= "  </thead>\n";
   $ret .= "  <tbody>\n";
@@ -116,6 +121,8 @@ function metricTable($data, $odates, $datasets) {
         $ret .= '      <td style="text-align: right;">'
           . ($data[$dataset][$odate] ?? "--") . "</td>\n";
       }
+    $ret .= "      <td>" . $averages[$dataset] . "</td>\n";
+    $ret .= "      <td>" . $growthRates[$dataset] . "</td>\n";
     $ret .= "    </tr>\n";
   }
 
@@ -131,8 +138,10 @@ function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
     $region, $start_date, $end_date) {
   $result = dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
     $end_date);
+  $data = $result[0];
+  $stats = calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier);
   echo "<h2>$metric</h2>\n";
-  echo metricTable(...$result);
+  echo metricTable(...$result, ...$stats);
   $permalinkUrlBase = "https://???/region.php#" . $metric;
   $graphIdentifier = "???";
   $fileName = metricGraph($result[0], $generateGraphCmdBase, $imagesPath,

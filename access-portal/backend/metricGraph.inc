@@ -148,6 +148,7 @@ function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier)
   $outlist = explode("======", $output);
   $avg = getWholeCsv($outlist[0]);
   $growth = getWholeCsv($outlist[1]);
+  return array($avg, $growth);
 }
 
 ?>
