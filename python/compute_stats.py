@@ -36,8 +36,8 @@ def growth_rate(df):
         # Get the first non-null time values for this column
         first_x = df[col][mask].index.astype(np.int64)[0]
         last_x = df[col][mask].index.astype(np.int64)[-1]
-        first_y = slope * first + intercept
-        last_y = slope * first + intercept
+        first_y = slope * first_x + intercept
+        last_y = slope * first_x + intercept
         growth = (last_y - first_y) / first_y
         result[col] = growth
     return result
