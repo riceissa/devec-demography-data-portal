@@ -121,8 +121,8 @@ function metricTable($data, $odates, $datasets, $averages, $growthRates) {
         $ret .= '      <td style="text-align: right;">'
           . ($data[$dataset][$odate] ?? "--") . "</td>\n";
       }
-    $ret .= "      <td>" . $averages[$dataset] . "</td>\n";
-    $ret .= "      <td>" . $growthRates[$dataset] . "</td>\n";
+    $ret .= '      <td style="text-align: right;">' . $averages[$dataset] . "</td>\n";
+    $ret .= '      <td style="text-align: right;">' . $growthRates[$dataset] . "</td>\n";
     $ret .= "    </tr>\n";
   }
 
@@ -136,14 +136,16 @@ function metricTable($data, $odates, $datasets, $averages, $growthRates) {
 // will print an HTML table and also display an image graphing the data.
 function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
     $region, $start_date, $end_date) {
+
+  $permalinkUrlBase = "https://???/region.php#" . $metric;
+  $graphIdentifier = "???";
   $result = dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
     $end_date);
   $data = $result[0];
   $stats = calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier);
+
   echo "<h2>$metric</h2>\n";
   echo metricTable(...$result, ...$stats);
-  $permalinkUrlBase = "https://???/region.php#" . $metric;
-  $graphIdentifier = "???";
   $fileName = metricGraph($result[0], $generateGraphCmdBase, $imagesPath,
     $permalinkUrlBase, $graphIdentifier);
   print '<img src="/images/' . $fileName . '-timeseries.png" alt="Graph should be here"></img>';
