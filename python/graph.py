@@ -57,7 +57,7 @@ def get_df(fname, top=0):
         top_cols = df.iloc[-1, 1:].sort_values(ascending=False)[:top].index.tolist()
     else:
         top_cols = None
-    df = df[:-1]
+    # df = df[:-1]
     # if "Month" in df:
     #     # 200610 -> "2006-10"
     #     df['Month'] = pd.to_datetime(df['Month'])
