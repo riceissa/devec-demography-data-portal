@@ -157,7 +157,7 @@ function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier)
     if (file_exists($filePathBase . "-stats.txt")) {
       exec("rm " . $filePathBase . "-stats.txt");
     }
-    $output = shell_exec("/home/issa/projects/devec-demography-data-portal/python/compute_stats.py " . $filePathBase . ".csv");
+    $output = shell_exec("$pythonDir/compute_stats.py " . $filePathBase . ".csv");
     file_put_contents($filePathBase . "-stats.txt", $output);
   } else {
     $output = file_get_contents($filePathBase . "-stats.txt");
