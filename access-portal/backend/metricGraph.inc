@@ -161,6 +161,13 @@ function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier,
     file_put_contents($filePathBase . "-stats.txt", $output);
   } else {
     $output = file_get_contents($filePathBase . "-stats.txt");
+    // On at least one occasion, the "-stats.txt" file existed but was empty.
+    // I'm not sure how this happened, but in case it happens again, here is a
+    // fix to run the command and store the results.
+    if (!trim($output)) {
+      $output = shell_exec("$pythonDir/compute_stats.py " . $filePathBase . ".csv");
+      file_put_contents($filePathBase . "-stats.txt", $output);
+    }
   }
 
   $outlist = explode("======", $output);
