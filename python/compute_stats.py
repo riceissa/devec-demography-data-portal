@@ -19,9 +19,8 @@ def main():
 
     print(avg.to_csv(sep='|'))
     print("======")
-    print(growth.to_csv(sep='|'))
-    print("======")
-    print(log_growth.to_csv(sep='|'))
+    for key, val in growth_rate(df):
+        print(key + "\t" + str(val))
 
 
 def growth_rate(df):
