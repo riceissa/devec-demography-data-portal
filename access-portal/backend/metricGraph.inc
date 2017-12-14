@@ -126,6 +126,24 @@ function getWholeCsv(string $csv, string $sep = "|") {
   return $result;
 }
 
+// Calculate the average and growth rate (linear fit) for each dataset in $data.
+// Here $data is organized like as follows:
+//     Array
+//     (
+//         [dataset1] => Array
+//             (
+//                 [20050000] => 1
+//                 [20060000] => 2
+//             )
+//
+//         [dataset2] => Array
+//             (
+//                 [20050000] => 3
+//                 [20060000] => 4
+//             )
+//
+//     )
+//
 // $permalinkUrlBase and $graphIdentifier are used to see if the stats need to
 // be recalculated. Otherwise the same calculation is used again.
 function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier) {
