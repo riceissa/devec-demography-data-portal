@@ -146,7 +146,7 @@ function getWholeCsv(string $csv, string $sep = "|") {
 //
 // $permalinkUrlBase and $graphIdentifier are used to see if the stats need to
 // be recalculated. Otherwise the same calculation is used again.
-function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier) {
+function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier, $pythonDir) {
   $csv = serializeData($data);
   $permalinkUrl = $permalinkUrlBase . $graphIdentifier;
   $fileName = hash("md5", $permalinkUrl);

@@ -14,6 +14,14 @@ if ($start_date = ($_REQUEST['start_date'] ?? '')) {
 if ($end_date = ($_REQUEST['end_date'] ?? '')) {
   $title .= " to " . htmlspecialchars($end_date);
 }
+
+if ($pass = ($_REQUEST['include_private'] ?? '')) {
+  if (hash("md5", $pass) == "d6430e381d7ca1ead4c25bd1600ffc41") {
+    $include_private = true;
+  }
+}
+$include_private = $include_private ?? false;
+
 ?>
 <head>
   <meta charset="utf-8">
@@ -59,12 +67,22 @@ if ($end_date = ($_REQUEST['end_date'] ?? '')) {
 // contains all dates appearing in the dataset and the latter contains all
 // datasets.
 function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
-    $end_date) {
+    $end_date, $include_private) {
 
-  if ($stmt = $mysqli->prepare("select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ?")) {
+  if ($include_private) {
+    $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ?";
+  } else {
+    $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ? having not (shortname REGEXP '^ted')";
+  }
+
+  if ($stmt = $mysqli->prepare($query)) {
     $stmt->bind_param("ssss", $region, $start_date, $end_date, $metric);
     $stmt->execute();
     $result = $stmt->get_result();
+  } else {
+    echo "<pre>\n";
+    echo $mysqli->error;
+    echo "</pre>\n";
   }
 
   // Stores table data in dataset(units) by year format. For example,
@@ -135,14 +153,15 @@ function metricTable($data, $odates, $datasets, $averages, $growthRates) {
 // Print information for the given metric/region/date range combination. This
 // will print an HTML table and also display an image graphing the data.
 function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
-    $region, $start_date, $end_date) {
+    $region, $start_date, $end_date, $include_private, $pythonDir) {
 
   $permalinkUrlBase = "https://???/region.php#" . $metric;
   $graphIdentifier = "???";
   $result = dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
-    $end_date);
+    $end_date, $include_private);
   $data = $result[0];
-  $stats = calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier);
+  $stats = calculateStats($data, $imagesPath, $permalinkUrlBase,
+    $graphIdentifier, $pythonDir);
 
   echo "<h2>$metric</h2>\n";
   echo metricTable(...$result, ...$stats);
@@ -152,11 +171,11 @@ function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
 }
 
 printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, "GDP",
-  $region, $start_date, $end_date);
+  $region, $start_date, $end_date, $include_private, $pythonDir);
 printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, "GDP per capita",
-  $region, $start_date, $end_date);
+  $region, $start_date, $end_date, $include_private, $pythonDir);
 printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, "Population",
-  $region, $start_date, $end_date);
+  $region, $start_date, $end_date, $include_private, $pythonDir);
 ?>
 
 <script>
