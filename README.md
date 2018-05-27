@@ -39,10 +39,10 @@ Now you can visit `http://localhost:8000/index.php` in your browser.
 
 For table sorting:
 
-    make fetch_table_sorting
+    make fetch_tablesorter
 
 This will fetch the necessary files to allow tables to be sorted.
-To remove these files, run `make clean_table_sorting`.
+To remove these files, run `make clean_tablesorter`.
 
 For [AnchorJS](https://github.com/bryanbraun/anchorjs):
 
