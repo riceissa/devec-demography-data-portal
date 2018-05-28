@@ -68,7 +68,7 @@ function serializeData(array $data, string $sep = '|', string $heading = "Year")
 function storeData(string $csv, string $filePath) {
   $dataHasChanged= false;
 
-  if (file_exists(! $filePath)) {
+  if (!file_exists($filePath)) {
     file_put_contents($filePath, $csv);
     $dataHasChanged = true;
   } else {
