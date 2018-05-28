@@ -157,7 +157,7 @@ function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier,
   # print "fileName = $fileName\n<br/>";
   $filePathBase = $imagesPath . $fileName;
   $dataHasChanged = storeData($csv, $filePathBase . ".csv");
-
+  
   if ($dataHasChanged or !file_exists($filePathBase . "-stats.txt")) {
     if (file_exists($filePathBase . "-stats.txt")) {
       exec("rm " . $filePathBase . "-stats.txt");

@@ -158,8 +158,8 @@ function metricTable($data, $odates, $datasets, $averages, $growthRates) {
 function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
     $region, $start_date, $end_date, $include_private, $pythonDir) {
 
-  $permalinkUrlBase = "https://???/region.php#" . $metric . ($include_private ? 'include_private' : 'no_include_private');
-  $graphIdentifier = "???";
+  $permalinkUrlBase = "https://devec.vipulnaik.com/region.php#" . $metric . ($include_private ? 'include_private' : 'no_include_private');
+  $graphIdentifier = "?region=" . $region . "&start_date=" . $start_date . "&end_date=" . $end_date;
   $result = dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
     $end_date, $include_private);
   $data = $result[0];
