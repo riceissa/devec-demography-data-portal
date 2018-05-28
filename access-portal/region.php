@@ -70,9 +70,9 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
     $end_date, $include_private) {
 
   if ($include_private) {
-    $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ?";
+    $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ? and ((units != 'constant LCU' and units != 'current LCU') or units is null)";
   } else {
-    $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ? having not (shortname REGEXP '^ted')";
+    $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ? having not (shortname REGEXP '^ted') and ((units != 'constant LCU' and units != 'current LCU') or units is null)";
   }
 
   # print "query = $query\n<br/>";
