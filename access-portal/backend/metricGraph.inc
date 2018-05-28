@@ -147,9 +147,14 @@ function getWholeCsv(string $csv, string $sep = "|") {
 // $permalinkUrlBase and $graphIdentifier are used to see if the stats need to
 // be recalculated. Otherwise the same calculation is used again.
 function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier, $pythonDir) {
+  print "data is as follows:\n<br/>";
+  print_r($data);
   $csv = serializeData($data);
+  print "csv = $csv\n<br/>";
   $permalinkUrl = $permalinkUrlBase . $graphIdentifier;
+  print "permalinkUrl = $permalinkUrl\n<br/>";
   $fileName = hash("md5", $permalinkUrl);
+  print "fileName = $fileName\n<br/>";
   $filePathBase = $imagesPath . $fileName;
   $dataHasChanged = storeData($csv, $filePathBase . ".csv");
 
@@ -170,8 +175,12 @@ function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier,
     }
   }
 
+  print "output = $output\n<br/>";
   $outlist = explode("======", $output);
+  print "outlist is as follows:\n<br/>";
+  print_r($outlist);
   $avg = getWholeCsv($outlist[0]);
+  print "avg = $avg\n<br/>";
   $growth = getWholeCsv($outlist[1]);
   return array($avg, $growth);
 }

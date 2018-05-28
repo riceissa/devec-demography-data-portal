@@ -75,6 +75,8 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
     $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and metric = ? having not (shortname REGEXP '^ted')";
   }
 
+  print "query = $query\n<br/>";
+  print "parameters to query: region = $region, start_date = $start_date, end_date = $end_date, metric = $metric\n<br/>";
   if ($stmt = $mysqli->prepare($query)) {
     $stmt->bind_param("ssss", $region, $start_date, $end_date, $metric);
     $stmt->execute();
@@ -95,6 +97,7 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
   $odates = array();
 
   while ($row = $result->fetch_assoc()) {
+    print "Reading a row from data\n<br/>";
     $rowname = $row['shortname'] . " (" . $row['units'] . ")";
     if (!in_array($rowname, $datasets)) {
       $datasets[] = $rowname;
