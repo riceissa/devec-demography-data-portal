@@ -150,7 +150,7 @@ function calculateStats($data, $imagesPath, $permalinkUrlBase, $graphIdentifier,
   print "data is as follows:\n<br/>";
   print_r($data);
   $csv = serializeData($data);
-  print "csv = $csv\n<br/>";
+  print "\n<br/>csv = $csv\n<br/>";
   $permalinkUrl = $permalinkUrlBase . $graphIdentifier;
   print "permalinkUrl = $permalinkUrl\n<br/>";
   $fileName = hash("md5", $permalinkUrl);
