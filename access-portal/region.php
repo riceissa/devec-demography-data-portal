@@ -129,7 +129,7 @@ function metricTable($precision, $data, $odates, $datasets, $averages, $growthRa
   $ret .= "    <tr>\n";
   $ret .= "      <th>Dataset</th>\n";
   $ret .= "      <th>Average</th>\n";
-  $ret .= "      <th>Growth rate</th>\n";
+  $ret .= "      <th>Growth (start to end, using linear fit)</th>\n";
   foreach ($odates as $odate) {
     $ret .= '      <th>' . $odate . '</th>' . "\n";
   }
