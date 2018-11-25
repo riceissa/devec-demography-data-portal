@@ -31,18 +31,19 @@ def growth_rate(df):
     for col in df.columns:
         # We have to mask the inputs to np.polyfit or else we will get NaNs as
         # outputs (if there is even a single NaN in the input)
-        mask = df[col].notnull()
+        logs = np.log(df[col])
+        mask = logs.notnull()
         slope, intercept = np.polyfit(df.index.astype(np.int64)[mask],
-                                      df[col][mask], 1)
+                                      logs[mask], 1)
 
         # Get the first and last non-null time values for this column
-        first_x = df[col][mask].index.astype(np.int64)[0]
-        last_x = df[col][mask].index.astype(np.int64)[-1]
+        first_x = logs[mask].index.astype(np.int64)[0]
+        last_x = logs[mask].index.astype(np.int64)[-1]
 
         first_y = slope * first_x + intercept
         last_y = slope * last_x + intercept
 
-        growth = (last_y - first_y) / first_y
+        growth = np.exp(last_y - first_y)
         result[col] = growth
 
     return result
