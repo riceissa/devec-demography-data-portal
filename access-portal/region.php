@@ -56,7 +56,6 @@ $include_private = $include_private ?? false;
 <body>
 <nav>
   <a href="/">Home</a>,
-  <a href="/about/">About</a>,
   <a href="/region.php">Region</a>
 </nav>
 
