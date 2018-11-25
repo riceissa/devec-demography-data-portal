@@ -123,7 +123,7 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
 // dataDatasetByYearForMetric. $averages and $growthRates are the average for
 // each dataset and the growth rate for each dataset, respectively. These are
 // intended to be the output of calculateStats.
-function metricTable($data, $odates, $datasets, $averages, $growthRates, $precision) {
+function metricTable($precision, $data, $odates, $datasets, $averages, $growthRates) {
   $ret = "<table>\n";
   $ret .= "  <thead>\n";
   $ret .= "    <tr>\n";
@@ -173,7 +173,7 @@ function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
     $graphIdentifier, $pythonDir);
 
   echo "<h2>$metric</h2>\n";
-  echo metricTable(...$result, ...$stats, $precision);
+  echo metricTable($precision, ...$result, ...$stats);
   $fileName = metricGraph($result[0], $generateGraphCmdBase, $imagesPath,
     $permalinkUrlBase, $graphIdentifier);
   print '<img src="/images/' . $fileName . '-timeseries.png" alt="Graph should be here"></img>';
