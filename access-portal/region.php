@@ -62,6 +62,7 @@ $include_private = $include_private ?? false;
 <h1><?= $title ?></h1>
 
 <?php
+include_once("regionblurb.inc");
 // Read data about a metric/region/date range combination from MySQL into a 2D
 // array, data, which stores datasets in rows and dates in columns so that
 // $data[$dataset][$date] gives the value corresponding to the given dataset

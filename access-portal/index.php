@@ -16,4 +16,9 @@ print '</head>';
 
 <p>The code for the portal is available on GitHub at <a href="https://github.com/riceissa/devec-demography-data-portal">riceissa/devec-demography-data-portal</a>. The data-crunching code for various data sources used is in separate repositories, all linked from the README of the portal.</p>
 
+<strong>Endpoint documentations</strong>
+
+<?php
+include_once("regionblurb.inc");
+?>
 </body>
