@@ -141,7 +141,7 @@ function metricTable($precision, $data, $odates, $datasets, $averages, $growthRa
     $ret .= "    <tr>\n";
     $ret .= "      <td>$dataset</td>\n";
     $ret .= '      <td style="text-align: right;">' . number_format($averages[$dataset], $precision) . "</td>\n";
-    $ret .= '      <td style="text-align: right;">' . number_format(100.0 * $growthRates[$dataset], $precision + 2) . "%</td>\n";
+    $ret .= '      <td style="text-align: right;">' . number_format(100.0 * $growthRates[$dataset], 2) . "%</td>\n";
       foreach ($odates as $odate) {
         $cleanedDataPoint = "--";
         if (array_key_exists($odate, $data[$dataset])) {
