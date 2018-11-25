@@ -123,16 +123,16 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
 // dataDatasetByYearForMetric. $averages and $growthRates are the average for
 // each dataset and the growth rate for each dataset, respectively. These are
 // intended to be the output of calculateStats.
-function metricTable($data, $odates, $datasets, $averages, $growthRates) {
+function metricTable($data, $odates, $datasets, $averages, $growthRates, $precision) {
   $ret = "<table>\n";
   $ret .= "  <thead>\n";
   $ret .= "    <tr>\n";
   $ret .= "      <th>Dataset</th>\n";
+  $ret .= "      <th>Average</th>\n";
+  $ret .= "      <th>Growth rate</th>\n";
   foreach ($odates as $odate) {
     $ret .= '      <th>' . $odate . '</th>' . "\n";
   }
-  $ret .= "      <th>Average</th>\n";
-  $ret .= "      <th>Growth rate</th>\n";
   $ret .= "    </tr>\n";
   $ret .= "  </thead>\n";
   $ret .= "  <tbody>\n";
@@ -140,12 +140,16 @@ function metricTable($data, $odates, $datasets, $averages, $growthRates) {
   foreach ($datasets as $dataset) {
     $ret .= "    <tr>\n";
     $ret .= "      <td>$dataset</td>\n";
-      foreach ($odates as $odate) {
-        $ret .= '      <td style="text-align: right;">'
-          . ($data[$dataset][$odate] ?? "--") . "</td>\n";
-      }
     $ret .= '      <td style="text-align: right;">' . $averages[$dataset] . "</td>\n";
     $ret .= '      <td style="text-align: right;">' . $growthRates[$dataset] . "</td>\n";
+      foreach ($odates as $odate) {
+        $cleanedDataPoint = "--";
+        if (array_key_exists($odate, $data[$dataset])) {
+          $cleanedDataPoint = number_format($data[$dataset][$odate], $precision)
+        }
+        $ret .= '      <td style="text-align: right;">'
+          . $cleanedDataPoint . "</td>\n";
+      }
     $ret .= "    </tr>\n";
   }
 
@@ -158,7 +162,7 @@ function metricTable($data, $odates, $datasets, $averages, $growthRates) {
 // Print information for the given metric/region/date range combination. This
 // will print an HTML table and also display an image graphing the data.
 function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
-    $region, $start_date, $end_date, $include_private, $pythonDir) {
+    $region, $start_date, $end_date, $include_private, $pythonDir, $precision) {
 
   $permalinkUrlBase = "https://devec.vipulnaik.com/region.php#" . $metric . ($include_private ? 'include_private' : 'no_include_private');
   $graphIdentifier = "?region=" . $region . "&start_date=" . $start_date . "&end_date=" . $end_date;
@@ -169,18 +173,18 @@ function printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, $metric,
     $graphIdentifier, $pythonDir);
 
   echo "<h2>$metric</h2>\n";
-  echo metricTable(...$result, ...$stats);
+  echo metricTable(...$result, ...$stats, $precision);
   $fileName = metricGraph($result[0], $generateGraphCmdBase, $imagesPath,
     $permalinkUrlBase, $graphIdentifier);
   print '<img src="/images/' . $fileName . '-timeseries.png" alt="Graph should be here"></img>';
 }
 
 printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, "GDP",
-  $region, $start_date, $end_date, $include_private, $pythonDir);
+  $region, $start_date, $end_date, $include_private, $pythonDir, 0);
 printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, "GDP per capita",
-  $region, $start_date, $end_date, $include_private, $pythonDir);
+  $region, $start_date, $end_date, $include_private, $pythonDir, 0);
 printMetricInfo($mysqli, $generateGraphCmdBase, $imagesPath, "Population",
-  $region, $start_date, $end_date, $include_private, $pythonDir);
+  $region, $start_date, $end_date, $include_private, $pythonDir, 0);
 ?>
 
 <script>
