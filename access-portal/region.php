@@ -49,6 +49,9 @@ $include_private = $include_private ?? false;
         border: 1px solid #aaaaaa;
     }
   </style>
+  <?php
+    include_once("analytics.inc");
+  ?>
 </head>
 <body>
 <nav>
