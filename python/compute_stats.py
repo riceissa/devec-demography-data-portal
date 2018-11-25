@@ -43,7 +43,7 @@ def growth_rate(df):
         first_y = slope * first_x + intercept
         last_y = slope * last_x + intercept
 
-        growth = np.exp(last_y - first_y)
+        growth = np.exp(last_y - first_y) - 1.0
         result[col] = growth
 
     return result
