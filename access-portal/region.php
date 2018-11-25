@@ -145,7 +145,7 @@ function metricTable($data, $odates, $datasets, $averages, $growthRates, $precis
       foreach ($odates as $odate) {
         $cleanedDataPoint = "--";
         if (array_key_exists($odate, $data[$dataset])) {
-          $cleanedDataPoint = number_format($data[$dataset][$odate], $precision)
+          $cleanedDataPoint = number_format($data[$dataset][$odate], $precision);
         }
         $ret .= '      <td style="text-align: right;">'
           . $cleanedDataPoint . "</td>\n";
