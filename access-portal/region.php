@@ -75,7 +75,7 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
   if ($include_private) {
     $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and (case when metric = 'cgdp' or metric = 'CGDP' then 'GDP' else case when metric in ('rgdpl', rgdpl2', 'rgdpch', 'rgdpwok', 'rgdpl2wok', 'rgdpl2pe', 'rgdpl2te') then 'GDP per capita' else metric end end) = ? and ((units != 'constant LCU' and units != 'current LCU') or units is null)";
   } else {
-    $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and (case when metric = 'cgdp' or metric = 'CGDP' then 'GDP' else case when (metric in ('rgdpl', rgdpl2', 'rgdpch', 'rgdpwok', 'rgdpl2wok', 'rgdpl2pe', 'rgdpl2te') then 'GDP per capita' else metric end end) = ? having not (shortname REGEXP '^ted') and ((units != 'constant LCU' and units != 'current LCU') or units is null)";
+    $query = "select *,(select shortname from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and (case when metric = 'cgdp' or metric = 'CGDP' then 'GDP' else case when metric in ('rgdpl', rgdpl2', 'rgdpch', 'rgdpwok', 'rgdpl2wok', 'rgdpl2pe', 'rgdpl2te') then 'GDP per capita' else metric end end) = ? having not (shortname REGEXP '^ted') and ((units != 'constant LCU' and units != 'current LCU') or units is null)";
   }
 
   # print "query = $query\n<br/>";
