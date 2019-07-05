@@ -72,16 +72,47 @@ include_once("regionblurb.inc");
 function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
     $end_date, $include_private) {
 
-  if ($include_private) {
-    $query = "select *,(select concat(shortname, ':', metric) from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and (case when metric in ('Real Gross Domestic Product per Capita, current price', 'Real GDP per capita (Constant Prices: Laspeyres), derived from growth rates of c, g, i', 'Real GDP per capita (Constant Prices: Laspeyres), derived from growth rates of domestic absorption', 'Real GDP per capita (Constant Prices: Chain series)','PPP Converted GDP Per Capita, G-K method, at current prices','PPP Converted Domestic Absorption Per Capita, average GEKS-CPDW, at current prices') then 'GDP per capita' else metric end) = ? and ((units != 'constant LCU' and units != 'current LCU') or units is null)";
+  if (is_array($region)) {
+    $region_part = "(";
+    for ($i = 0; $i < count($region); $i++) {
+      if ($i == 0) {
+        $region_part .= "region = ?";
+      } else {
+        $region_part .= " or region = ?";
+      }
+    }
+    $region_part .= ")";
   } else {
-    $query = "select *,(select concat(shortname, ':', metric) from datasets where datasets.url = database_url) as shortname from data where region = ? and odate between ? and ? and (case when metric in ('Real Gross Domestic Product per Capita, current price', 'Real GDP per capita (Constant Prices: Laspeyres), derived from growth rates of c, g, i', 'Real GDP per capita (Constant Prices: Laspeyres), derived from growth rates of domestic absorption', 'Real GDP per capita (Constant Prices: Chain series)','PPP Converted GDP Per Capita, G-K method, at current prices','PPP Converted Domestic Absorption Per Capita, average GEKS-CPDW, at current prices') then 'GDP per capita' else metric end) = ? having not (shortname REGEXP '^ted') and ((units != 'constant LCU' and units != 'current LCU') or units is null)";
+    $region_part = "region = ?";
+  }
+
+  if ($include_private) {
+    $query = "select *,(select concat(shortname, ':', metric) from datasets where datasets.url = database_url) as shortname from data where " . $region_part . " and odate between ? and ? and (case when metric in ('Real Gross Domestic Product per Capita, current price', 'Real GDP per capita (Constant Prices: Laspeyres), derived from growth rates of c, g, i', 'Real GDP per capita (Constant Prices: Laspeyres), derived from growth rates of domestic absorption', 'Real GDP per capita (Constant Prices: Chain series)','PPP Converted GDP Per Capita, G-K method, at current prices','PPP Converted Domestic Absorption Per Capita, average GEKS-CPDW, at current prices') then 'GDP per capita' else metric end) = ? and ((units != 'constant LCU' and units != 'current LCU') or units is null)";
+  } else {
+    $query = "select *,(select concat(shortname, ':', metric) from datasets where datasets.url = database_url) as shortname from data where " . $region_part . " and odate between ? and ? and (case when metric in ('Real Gross Domestic Product per Capita, current price', 'Real GDP per capita (Constant Prices: Laspeyres), derived from growth rates of c, g, i', 'Real GDP per capita (Constant Prices: Laspeyres), derived from growth rates of domestic absorption', 'Real GDP per capita (Constant Prices: Chain series)','PPP Converted GDP Per Capita, G-K method, at current prices','PPP Converted Domestic Absorption Per Capita, average GEKS-CPDW, at current prices') then 'GDP per capita' else metric end) = ? having not (shortname REGEXP '^ted') and ((units != 'constant LCU' and units != 'current LCU') or units is null)";
   }
 
   # print "query = $query\n<br/>";
   # print "parameters to query: region = $region, start_date = $start_date, end_date = $end_date, metric = $metric\n<br/>";
   if ($stmt = $mysqli->prepare($query)) {
-    $stmt->bind_param("ssss", $region, $start_date, $end_date, $metric);
+    $param_str = "";
+    $params = array();
+    if (is_array($region)) {
+      foreach ($region as $r) {
+        $param_str .= "s";
+        $params[] = $r;
+      }
+    } else {
+      $param_str .= "s";
+      $params[] = $region;
+    }
+    $param_str .= "s";
+    $params[] = $start_date;
+    $param_str .= "s";
+    $params[] = $end_date;
+    $param_str .= "s";
+    $params[] = $metric;
+    $stmt->bind_param($param_str, ...$params);
     $stmt->execute();
     $result = $stmt->get_result();
   } else {
@@ -90,9 +121,9 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
     echo "</pre>\n";
   }
 
-  // Stores table data in dataset(units) by year format. For example,
-  // $data['maddison2010 (1990 international dollar)']['20050000'] would
-  // access the value for Maddison 2010 for the year 2005 for some metric
+  // Stores table data in "region: dataset(units)" by year format. For example,
+  // $data['India: maddison2010 (1990 international dollar)']['20050000'] would
+  // access the value for India in Maddison 2010 for the year 2005 for some metric
   // measured in 1990 international dollar.
   $data = array();
 
@@ -101,7 +132,7 @@ function dataDatasetByYearForMetric($mysqli, $metric, $region, $start_date,
 
   while ($row = $result->fetch_assoc()) {
     # print "Reading a row from data\n<br/>";
-    $rowname = $row['shortname'] . " (" . $row['units'] . ")";
+    $rowname = $row['region'] . ": " . $row['shortname'] . " (" . $row['units'] . ")";
     if (!in_array($rowname, $datasets)) {
       $datasets[] = $rowname;
     }
