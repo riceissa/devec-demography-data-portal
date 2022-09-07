@@ -31,7 +31,7 @@ $include_private = $include_private ?? false;
   <meta property="og:locale" content="en_US" />
   <title><?= $title ? $title . " - Devec/Demography Data Portal" : "Devec/Demography Data Portal" ?></title>
   <link rel="stylesheet" href="/style.css">
-  <script src="/jquery.min.js"></script>
+  <script src="/jquery-3.1.1.min.js"></script>
   <script src="/jquery.tablesorter.js"></script>
   <script src="/anchor.min.js"></script>
   <style type="text/css">
